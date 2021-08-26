@@ -117,8 +117,10 @@ class ListItem extends StatelessWidget {
                   width: 50,
                   height: 50,
                   decoration: BoxDecoration(
+                    // กำหนดขอบมน
                     borderRadius: BorderRadius.circular(30),
                     color: Colors.white,
+                    // กำหนดเงา
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.25),

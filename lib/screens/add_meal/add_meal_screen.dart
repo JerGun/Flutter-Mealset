@@ -29,6 +29,7 @@ class _AddMealScreenState extends State<AddMealScreen> {
   double tdee = 0;
 
   final titleController = TextEditingController();
+  final amountController = TextEditingController();
   final heightController = TextEditingController();
   final weightController = TextEditingController();
   final ageController = TextEditingController();
@@ -36,6 +37,7 @@ class _AddMealScreenState extends State<AddMealScreen> {
 
   late List foods;
 
+  // อ่าน jsonfile แล้วเก็บค่าไว้ใน foods
   Future readJsonData() async {
     final jsondata = await rootBundle.loadString('assets/data/food.json');
     setState(() {
@@ -86,6 +88,7 @@ class _AddMealScreenState extends State<AddMealScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 10),
+              // สร้างกล่องข้อความโดยเรียกใช้ class TextInput และส่ง parameters width title hinText และ controller ไปยัง class
               TextInput(
                 width: 200,
                 title: 'ชื่อชุดอาหาร: ',
@@ -94,6 +97,14 @@ class _AddMealScreenState extends State<AddMealScreen> {
                 keyboardType: TextInputType.text,
               ),
               SizedBox(height: 20),
+              // สร้างกล่องข้อความโดยเรียกใช้ class TextInput และส่ง parameters width title hinText และ controller ไปยัง class
+              TextInput(
+                title: 'จำนวนมื้ออาหาร: ',
+                hintText: '5',
+                controller: amountController,
+              ),
+              SizedBox(height: 20),
+              // สร้างแถว
               Row(
                 // Children Widget จะชิดซ้ายทั้งหมด
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -122,6 +133,7 @@ class _AddMealScreenState extends State<AddMealScreen> {
                               isSelected = [true, false];
                             });
                           },
+                          // เรียกใช้ Gender เป็น child โดยส่ง parameters isSelected index และ genderTitle
                           child: Gender(
                             isSelected: isSelected,
                             index: 0,
@@ -136,6 +148,7 @@ class _AddMealScreenState extends State<AddMealScreen> {
                               isSelected = [false, true];
                             });
                           },
+                          // เรียกใช้ Gender เป็น child โดยส่ง parameters isSelected index และ genderTitle
                           child: Gender(
                             isSelected: isSelected,
                             index: 1,
@@ -148,18 +161,21 @@ class _AddMealScreenState extends State<AddMealScreen> {
                 ],
               ),
               SizedBox(height: 20),
+              // สร้างกล่องข้อความโดยเรียกใช้ class TextInput และส่ง parameters title hinText และ controller ไปยัง class
               TextInput(
                 title: 'ส่วนสูง (เซนติเมตร): ',
                 hintText: '175',
                 controller: heightController,
               ),
               SizedBox(height: 20),
+              // สร้างกล่องข้อความโดยเรียกใช้ class TextInput และส่ง parameters title hinText และ controller ไปยัง class
               TextInput(
                 title: 'น้ำหนัก (กิโลกรัม): ',
                 hintText: '70',
                 controller: weightController,
               ),
               SizedBox(height: 20),
+              // สร้างกล่องข้อความโดยเรียกใช้ class TextInput และส่ง parameters title hinText และ controller ไปยัง class
               TextInput(
                 title: 'อายุ (ปี): ',
                 hintText: '23',
@@ -183,8 +199,9 @@ class _AddMealScreenState extends State<AddMealScreen> {
                           bottomRight: Radius.circular(30),
                         ),
                         border: Border.all(width: 1.5, color: Colors.green)),
-                    // ซ่อนเส้นใต้ข้อความ
+                    // ซ่อนเส้นใต้ข้อความในกล่อง Dropdown
                     child: DropdownButtonHideUnderline(
+                      // สร้าง Dropdown
                       child: DropdownButton(
                         value: dropdownValue,
                         onChanged: (String? newValue) {
@@ -221,7 +238,7 @@ class _AddMealScreenState extends State<AddMealScreen> {
         // Padding เพื่อดันด้านล่างเมื่อเปิด Keyboard ความสูงที่จะดันเท่ากับขนาด Keyboard ที่มาแทรก 90%
         Padding(
           padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom * 0.8),
+              bottom: MediaQuery.of(context).viewInsets.bottom * 0.6),
           child: Column(
             children: [
               // แสดง Text เมื่อ isEmpty เท่ากับ true
@@ -272,6 +289,7 @@ class _AddMealScreenState extends State<AddMealScreen> {
   // ฟังก์ชันในการตรวจสอบค่าที่ได้รับจาก User
   void checkInput() {
     titleController.text == '' ||
+            amountController.text == '' ||
             weightController.text == '' ||
             heightController.text == '' ||
             ageController.text == ''
@@ -339,9 +357,11 @@ class _AddMealScreenState extends State<AddMealScreen> {
                 style: TextStyle(color: Colors.red),
               ),
             ),
+            // 
             TextButton(
               onPressed: () async {
-                randomMeals(5);
+                // ฟังก์ชันสุ่มอาหาร
+                randomMeals(amountController.text);
                 Navigator.pop(context);
               },
               child: Text(
@@ -355,24 +375,28 @@ class _AddMealScreenState extends State<AddMealScreen> {
     );
   }
 
-  void randomMeals(int mealsNumber) async {
+  // ฟังก์ชันในการสุ่มอาหาร
+  void randomMeals(String mealsNumber) async {
     num totalCalories = 0;
     List<String> randomFoods = [];
 
     final prefs = await SharedPreferences.getInstance();
 
     // loop สุ่มเมนูอาหาร
-    for (var i = 0; i < mealsNumber; i++) {
+    for (var i = 0; i < int.parse(mealsNumber); i++) {
+      // Map ข้อมูลที่สุ่มจาก List foods
       Map randomFood = foods[Random().nextInt(foods.length)];
+      // แยกข้อมูลในรูปของ key และ value
       randomFood.forEach((key, value) => key == 'avg_calories'
           ? totalCalories += value
           : randomFoods.add(value));
     }
 
-    print(titleController.text);
-    print(tdee);
-    print(totalCalories);
-    print(randomFoods);
+    print('ชื่อชุดอาหาร: ${titleController.text}');
+    print('จำนวนมื้อ: $mealsNumber');
+    print('TDEE: $tdee');
+    print('แคลอรี่โดยประมาณ: $totalCalories');
+    print('อาหาร: $randomFoods');
 
     // เก็บ Data ในรูปของ key และ value
     prefs.setString('title', titleController.text);

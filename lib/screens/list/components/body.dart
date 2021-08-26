@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_mealset/models/meal.dart';
-import 'package:flutter_mealset/screens/home/components/list_item.dart';
+import 'package:flutter_mealset/screens/list/components/list_item.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Body extends StatefulWidget {
@@ -19,16 +19,16 @@ class _BodyState extends State<Body> {
 
   List meals = [
     // ชุดข้อมูลเพื่อทดสอบ
-    Meal(
-        title: 'ชุดทดลองที่ 1',
-        foods: ['Fried rice', 'Hamburger'],
-        calories: '2300',
-        tdee: 1500),
-    Meal(
-        title: 'ชุดทดลองที่ 2',
-        foods: ['ข้าวมันไก่', 'ข้าวหมูแดง'],
-        calories: '1600',
-        tdee: 1500),
+    // Meal(
+    //     title: 'ชุดทดลองที่ 1',
+    //     foods: ['Fried rice', 'Hamburger'],
+    //     calories: '2300',
+    //     tdee: 1500),
+    // Meal(
+    //     title: 'ชุดทดลองที่ 2',
+    //     foods: ['ข้าวมันไก่', 'ข้าวหมูแดง'],
+    //     calories: '1600',
+    //     tdee: 1500),
   ];
 
   @override
@@ -56,9 +56,7 @@ class _BodyState extends State<Body> {
                       foods: meals[index].foods,
                       calories: meals[index].calories,
                       delete: () {
-                        setState(() {
-                          meals.removeAt(index);
-                        });
+                        deleteListItem(index, meals[index].title);
                       },
                       color: ((meals[index].tdee -
                                       double.parse(meals[index].calories))
@@ -95,6 +93,49 @@ class _BodyState extends State<Body> {
     );
   }
 
+  // ฟังก์ชันในการลบ ListItem
+  deleteListItem(int index, String title) {
+    // เปิด Dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('ลบรายการ'),
+          content: Text('ต้องการลบรายการชื่อ $title ใช่หรือไม่?'),
+          actions: [
+            // สร้างปุ่มเพื่อยกเลิกการลบ
+            TextButton(
+              onPressed: () {
+                // ปิด AlertDialog
+                Navigator.pop(context);
+              },
+              child: Text(
+                'ไม่',
+                style: TextStyle(color: Colors.grey[700]),
+              ),
+            ),
+            // สร้างปุ่มเพื่อยืนยันการลบ
+            TextButton(
+              onPressed: () async {
+                // ลบข้อมูลออกจาก List meals ณ ตำแหน่ง index
+                setState(() {
+                  meals.removeAt(index);
+                });
+                // ออกจาก Dialog
+                Navigator.pop(context);
+              },
+              child: Text(
+                'ใช่',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // ฟังก์ชันในการ refresh ListView โดยการตรวจสอบว่า prefs มีการเก็บข้อมูลไว้หรือไม่ถ้ามีให้เพิ่มข้อมูลเข้าไปใน List meals
   FutureOr<void> refreshData() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
