@@ -19,16 +19,16 @@ class _BodyState extends State<Body> {
 
   List meals = [
     // ชุดข้อมูลเพื่อทดสอบ
-    // Meal(
-    //     title: 'ชุดทดลองที่ 1',
-    //     foods: ['Fried rice', 'Hamburger'],
-    //     calories: '2300',
-    //     tdee: 1500),
-    // Meal(
-    //     title: 'ชุดทดลองที่ 2',
-    //     foods: ['ข้าวมันไก่', 'ข้าวหมูแดง'],
-    //     calories: '1600',
-    //     tdee: 1500),
+    Meal(
+        title: 'ชุดทดลองที่ 1',
+        foods: ['Fried rice', 'Hamburger'],
+        calories: '2300',
+        tdee: 1500),
+    Meal(
+        title: 'ชุดทดลองที่ 2',
+        foods: ['ข้าวมันไก่', 'ข้าวหมูแดง'],
+        calories: '1600',
+        tdee: 1500),
   ];
 
   @override
@@ -58,6 +58,7 @@ class _BodyState extends State<Body> {
                       delete: () {
                         deleteListItem(index, meals[index].title);
                       },
+                      // เปลี่ยนสีตามเงื่อนไข ถ้าค่าสัมบูรณ์ของ TDEE - Calories ของอาหารที่สุ่มมาแล้วได้ ไม่เกิน 500
                       color: ((meals[index].tdee -
                                       double.parse(meals[index].calories))
                                   .abs() <=

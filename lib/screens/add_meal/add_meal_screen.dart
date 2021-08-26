@@ -45,6 +45,7 @@ class _AddMealScreenState extends State<AddMealScreen> {
     });
   }
 
+  // เรียกใช้ฟังก์ชันเมื่อเริ่มต้น
   @override
   void initState() {
     super.initState();
@@ -357,7 +358,7 @@ class _AddMealScreenState extends State<AddMealScreen> {
                 style: TextStyle(color: Colors.red),
               ),
             ),
-            // 
+            //
             TextButton(
               onPressed: () async {
                 // ฟังก์ชันสุ่มอาหาร
