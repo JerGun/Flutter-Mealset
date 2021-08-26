@@ -24,9 +24,7 @@ class HomeScreen extends StatelessWidget {
               borderRadius: BorderRadius.only(topLeft: Radius.circular(80)),
             ),
             builder: (BuildContext context) => Container(
-              // ความสูง 70% ของหน้าจอ
-              // height: MediaQuery.of(context).size.height * 0.7,
-              child: AddMeal(),
+              child: AddMealScreen(),
             ),
           );
         },

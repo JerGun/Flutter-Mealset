@@ -1,0 +1,82 @@
+[
+  {
+    "name":  "หมูทอดกระเทียม",
+    "avg_calories": 200
+  },
+  {
+    "name":  "ข้าวมันไก่",
+    "avg_calories": 515
+  },
+   {
+    "name":  "ข้าวหมูแดง",
+    "avg_calories": 438
+  },
+  {
+   "name":  "ข้าวผัดกระเพราไก่",
+   "avg_calories": 554
+ },
+  {
+   "name":  "ผัดผักบุ้ง",
+   "avg_calories": 210
+  },
+  {
+    "name":  "แกงจืดเต้าหู้หมูสับ",
+    "avg_calories": 120
+  },
+  {
+    "name":  "ผัดไท",
+    "avg_calories": 480
+  },
+  {
+    "name":  "เต้าหู้ทรงเครื่อง",
+    "avg_calories": 300
+  },
+  {
+    "name":  "ต้มยำกุ้ง",
+    "avg_calories": 320
+  },
+  {
+    "name":  "ไข่พะโล้",
+    "avg_calories": 210
+  },
+  {
+    "name":  "ต้มยำปลากรอบ",
+    "avg_calories": 152
+  },
+  {
+    "name":  "แกงจืดรวมมิตรทะเล",
+    "avg_calories": 150
+  },
+  {
+    "name":  "ข้าวต้มปลา",
+    "avg_calories": 220
+  },
+  {
+    "name":  "ยำปลาดุกฟู",
+    "avg_calories": 275
+  },
+  {
+    "name":  "ทอดมันปลา",
+    "avg_calories": 220
+  },
+  {
+    "name":  "น้ำพริกอ่อง",
+    "avg_calories": 212
+  },
+  {
+    "name":  "ผัดผักบุ้งไฟแดง",
+    "avg_calories": 210
+  },
+  {
+    "name":  "ขนมจีนน้ำยา",
+    "avg_calories": 240
+  },
+  {
+    "name":  "ห่อหมกปู",
+    "avg_calories": 240
+  },
+  {
+    "name":  "ผัดกะเพรา",
+    "avg_calories": 540
+  }
+]

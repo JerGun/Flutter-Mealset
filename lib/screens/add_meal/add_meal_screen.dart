@@ -1,15 +1,20 @@
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_mealset/screens/add_meal/components/gender.dart';
 import 'package:flutter_mealset/screens/add_meal/components/text_input.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class AddMeal extends StatefulWidget {
-  AddMeal({Key? key}) : super(key: key);
+class AddMealScreen extends StatefulWidget {
+  AddMealScreen({Key? key}) : super(key: key);
 
   @override
-  _AddMealState createState() => _AddMealState();
+  _AddMealScreenState createState() => _AddMealScreenState();
 }
 
-class _AddMealState extends State<AddMeal> {
+class _AddMealScreenState extends State<AddMealScreen> {
   List<bool> isSelected = [true, false];
   List<String> activity = <String>[
     'ไม่ออกกำลังกาย',
@@ -21,16 +26,33 @@ class _AddMealState extends State<AddMeal> {
   String dropdownValue = 'ไม่ออกกำลังกาย';
   bool isEmpty = false;
 
-  late double bmr;
+  double tdee = 0;
 
+  final titleController = TextEditingController();
   final heightController = TextEditingController();
   final weightController = TextEditingController();
   final ageController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
+  late List foods;
+
+  Future readJsonData() async {
+    final jsondata = await rootBundle.loadString('assets/data/food.json');
+    setState(() {
+      foods = json.decode(jsondata);
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    this.readJsonData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
+      // กำหนดให้ขนาดแนวตั้งเท่ากับ min
       mainAxisSize: MainAxisSize.min,
       children: [
         // กล่องดันด้านนอกเฉพาะด้านบน 20 ด้านล่าง 10
@@ -43,7 +65,7 @@ class _AddMealState extends State<AddMeal> {
               Icon(Icons.local_dining, color: Colors.green, size: 42),
               SizedBox(width: 10),
               Text(
-                'คำนวณแคลอรี่',
+                'สุ่มชุดอาหาร',
                 style: TextStyle(fontSize: 22),
               ),
             ],
@@ -60,9 +82,18 @@ class _AddMealState extends State<AddMeal> {
         Container(
           margin: EdgeInsets.only(left: 40),
           child: Column(
+            // กำหนดให้ Widget ชิดซ้าย
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 10),
+              TextInput(
+                width: 200,
+                title: 'ชื่อชุดอาหาร: ',
+                hintText: 'ชุดทดลอง',
+                controller: titleController,
+                keyboardType: TextInputType.text,
+              ),
+              SizedBox(height: 20),
               Row(
                 // Children Widget จะชิดซ้ายทั้งหมด
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -142,6 +173,7 @@ class _AddMealState extends State<AddMeal> {
                     'กิจกรรม: ',
                     style: TextStyle(fontSize: 18),
                   ),
+                  // กล่องขอบมนเฉพาะด้านบนซ้าย ล่างซ้าย ล่างขวา ด้านละ 30 สีขอบสีเขียว
                   Container(
                     height: 40,
                     decoration: BoxDecoration(
@@ -156,10 +188,12 @@ class _AddMealState extends State<AddMeal> {
                       child: DropdownButton(
                         value: dropdownValue,
                         onChanged: (String? newValue) {
+                          // Set ค่าเมื่อเลือกค่าใหม่
                           setState(() {
                             dropdownValue = newValue!;
                           });
                         },
+                        // กำหนด item ใน Dropdown
                         items: activity
                             .map(
                               (String value) => DropdownMenuItem(
@@ -180,25 +214,28 @@ class _AddMealState extends State<AddMeal> {
                   ),
                 ],
               ),
-              SizedBox(height: 30),
+              SizedBox(height: 20),
             ],
           ),
         ),
-
+        // Padding เพื่อดันด้านล่างเมื่อเปิด Keyboard ความสูงที่จะดันเท่ากับขนาด Keyboard ที่มาแทรก 90%
         Padding(
-          padding:
-              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom * 0.8),
           child: Column(
             children: [
+              // แสดง Text เมื่อ isEmpty เท่ากับ true
               if (isEmpty)
                 Text(
                   'กรุณากรอกข้อมูลให้ครบถ้วน',
                   style: TextStyle(color: Colors.red),
                 ),
               SizedBox(height: 10),
+              // กล่องสูง 50 ยาว 200
               Container(
                 height: 50,
                 width: 200,
+                // ปุ่มข้อความขอบมนเฉพาะด้านบนซ้าย ล่างซ้าย ล่างขวา ด้านละ 30 สีพื้นหลังสีเขียว สีเบื้องหน้าสีดำ
                 child: TextButton(
                   style: ButtonStyle(
                       shape: MaterialStateProperty.all(RoundedRectangleBorder(
@@ -227,85 +264,120 @@ class _AddMealState extends State<AddMeal> {
             ],
           ),
         ),
-        SizedBox(height: 40),
+        SizedBox(height: 30),
       ],
     );
   }
 
+  // ฟังก์ชันในการตรวจสอบค่าที่ได้รับจาก User
   void checkInput() {
-    AlertDialog alertDialog = AlertDialog(
-      title: Text('BMR Calculator'),
-      content: Text('BMR = $bmr แคลอรี่'),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Text(
-            'ปิด',
-            style: TextStyle(color: Colors.red),
-          ),
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Text(
-            'สุ่มมื้ออาหาร',
-            style: TextStyle(color: Colors.green),
-          ),
-        ),
-      ],
-    );
-
-    weightController.text == '' ||
+    titleController.text == '' ||
+            weightController.text == '' ||
             heightController.text == '' ||
             ageController.text == ''
         ? setState(() {
             isEmpty = true;
           })
-        : {
-            bmrCalculator(),
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return alertDialog;
-              },
-            )
-          };
+        : tdeeCalculator();
   }
 
-  void bmrCalculator() {
+  // ฟังก์ชันในการคำนวณ TDEE ต่อวันและเปิด AlertDialog
+  void tdeeCalculator() {
+    // ปิด Bottom Dialog
+    Navigator.pop(context);
+
+    // ปิด Keyboard
+    FocusScope.of(context).unfocus();
+
+    double bmr;
+
+    // คำนวณ BMR
     isSelected[0]
         ? bmr = 66 +
             (13.7 * double.parse(weightController.text)) +
             (5 * double.parse(heightController.text)) -
             (6.8 * int.parse(ageController.text))
-        : bmr = 665 +
+        : bmr = 655 +
             (9.6 * double.parse(weightController.text)) +
             (1.8 * double.parse(heightController.text)) -
             (4.7 * int.parse(ageController.text));
 
+    // คำนวณ TDEE
     switch (dropdownValue) {
       case 'ไม่ออกกำลังกาย':
-        bmr *= 1.2;
+        tdee = (bmr * 1.2).roundToDouble();
         break;
       case '1 - 3 วัน/สัปดาห์':
-        bmr *= 1.375;
+        tdee = (bmr * 1.375).roundToDouble();
         break;
       case '3 - 5 วัน/สัปดาห์':
-        bmr *= 1.55;
+        tdee = (bmr * 1.55).roundToDouble();
         break;
       case '6 - 7 วัน/สัปดาห์':
-        bmr *= 1.725;
+        tdee = (bmr * 1.725).roundToDouble();
         break;
       case 'ออกกำลังกายทุกวันเช้าเย็น':
-        bmr *= 1.9;
+        tdee = (bmr * 1.9).roundToDouble();
         break;
     }
-    print(bmr);
-    setState(() {
-      isEmpty = false;
-    });
+
+    // เปิด AlertDialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('TDEE Report'),
+          content: Text('TDEE = $tdee แคลอรี่'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // ปิด AlertDialog
+                Navigator.pop(context);
+              },
+              child: Text(
+                'ปิด',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                randomMeals(5);
+                Navigator.pop(context);
+              },
+              child: Text(
+                'สุ่มมื้ออาหาร',
+                style: TextStyle(color: Colors.green),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void randomMeals(int mealsNumber) async {
+    num totalCalories = 0;
+    List<String> randomFoods = [];
+
+    final prefs = await SharedPreferences.getInstance();
+
+    // loop สุ่มเมนูอาหาร
+    for (var i = 0; i < mealsNumber; i++) {
+      Map randomFood = foods[Random().nextInt(foods.length)];
+      randomFood.forEach((key, value) => key == 'avg_calories'
+          ? totalCalories += value
+          : randomFoods.add(value));
+    }
+
+    print(titleController.text);
+    print(tdee);
+    print(totalCalories);
+    print(randomFoods);
+
+    // เก็บ Data ในรูปของ key และ value
+    prefs.setString('title', titleController.text);
+    prefs.setDouble('tdee', tdee);
+    prefs.setString('calories', totalCalories.toString());
+    prefs.setStringList('foods', randomFoods);
   }
 }
